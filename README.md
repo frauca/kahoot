@@ -14,3 +14,8 @@ The features will be:
 * Once started each question has 25 seconds counter down.
 * If every one has answered then it goes to the next question.
 * At the end shows the results just correct answeres and order by that
+
+
+## Run the project
+
+on the root folder run `mvn spring-boot:run -pl backend`
