@@ -19,3 +19,21 @@ The features will be:
 ## Run the project
 
 on the root folder run `mvn spring-boot:run -pl backend`
+
+### NUXT commands
+
+  To get started:
+
+	cd frontend
+	npm run dev
+
+  To build & start for production:
+
+	cd frontend
+	npm run build
+	npm run start
+
+  To test:
+
+	cd frontend
+	npm run test

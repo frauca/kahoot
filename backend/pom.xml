@@ -65,14 +65,14 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-server</id>
                         <phase>validate</phase>
                         <goals><goal>copy-resources</goal></goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/classes/resources/</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/frontend/.nuxt/dist/server/</directory>
+                                    <directory>${project.parent.basedir}/frontend/dist/</directory>
                                 </resource>
                             </resources>
                         </configuration>
