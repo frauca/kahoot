@@ -14,28 +14,12 @@
 
 package frauca.kahoot.server.quiz;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import org.springframework.data.annotation.Id;
+import frauca.kahoot.server.quiz.Quiz;
 
-//Could not be immutable. I have not get the point to make it work with r2dbc
-@Data
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = Quiz.QuizBuilder.class)
-@AllArgsConstructor
-public class Quiz {
-
-    @Id
-    Long id;
-    @NonNull
-    String title;
-
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class QuizBuilder {
-
+public class QuizSamples {
+    public static Quiz aQuiz(){
+        return Quiz.builder()
+                .title("The first sample for testing")
+                .build();
     }
 }
