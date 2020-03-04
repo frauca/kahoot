@@ -15,7 +15,7 @@
 package frauca.kahoot.server.quiz.endpoint;
 
 import frauca.kahoot.server.quiz.Quiz;
-import frauca.kahoot.server.quiz.state.QuizRepository;
+import frauca.kahoot.server.quiz.state.QuizService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -26,19 +26,18 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 import static org.springframework.web.reactive.function.BodyInserters.fromPublisher;
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
 public class QuizRouter {
 
-    private final QuizRepository repository;
+    private final QuizService service;
 
-    public QuizRouter(QuizRepository repository) {
-        this.repository = repository;
+    public QuizRouter(QuizService service) {
+        this.service = service;
     }
 
     @Bean
@@ -46,12 +45,13 @@ public class QuizRouter {
         return RouterFunctions.route()
                 .path("/quizzes", builder -> builder
                         .POST("", accept(MediaType.APPLICATION_JSON), this::saveQuiz)
-                        .GET("", accept(MediaType.APPLICATION_JSON), this::allQuizzes))
+                        .GET("", accept(MediaType.APPLICATION_JSON), this::allQuizzes)
+                        .DELETE("/{id}", accept(MediaType.APPLICATION_JSON), this::deleteQuiz))
                 .build();
     }
 
     public Mono<ServerResponse> allQuizzes(ServerRequest reques) {
-        Flux<Quiz> quizzes = repository.findAll();
+        Flux<Quiz> quizzes = service.findAll();
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(fromPublisher(quizzes, Quiz.class));
     }
@@ -59,9 +59,16 @@ public class QuizRouter {
 
     public Mono<ServerResponse> saveQuiz(ServerRequest request) {
         Mono<Quiz> quiz = request.bodyToMono(Quiz.class)
-                            .flatMap(repository::save);
+                .flatMap(service::save);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(fromPublisher(quiz, Quiz.class));
+    }
+
+    public Mono<ServerResponse> deleteQuiz(ServerRequest request) {
+        long id = Objects.requireNonNull(Long.valueOf(request.pathVariable("id")));
+        return service.findById(id)
+                .flatMap(service::delete)
+                .then(ServerResponse.ok().build());
     }
 }

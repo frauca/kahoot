@@ -1,7 +1,7 @@
 package frauca.kahoot.server.quiz.endpoint;
 
 import frauca.kahoot.server.quiz.Quiz;
-import frauca.kahoot.server.quiz.state.QuizRepository;
+import frauca.kahoot.server.quiz.state.QuizService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -26,14 +26,14 @@ import static org.mockito.Mockito.verify;
 class QuizRouterTests {
 
     @MockBean
-    QuizRepository repository;
+    QuizService service;
 
     @Autowired
     WebTestClient webClient;
 
     @BeforeEach
     public void mockRepository() {
-        doAnswer(quizWithId()).when(repository).save(any(Quiz.class));
+        doAnswer(quizWithId()).when(service).save(any(Quiz.class));
     }
 
     @Test
@@ -45,19 +45,35 @@ class QuizRouterTests {
                 .exchange()
                 .expectStatus().is2xxSuccessful();
 
-        verify(repository).save(any(Quiz.class));
+        verify(service).save(any(Quiz.class));
     }
 
     @Test
     public void getAQuiz() {
-        doReturn(Flux.just(aQuiz())).when(repository).findAll();
+        doReturn(Flux.just(aQuiz())).when(service).findAll();
 
         webClient.get()
                 .uri("/quizzes")
                 .exchange()
                 .expectStatus().is2xxSuccessful();
 
-        verify(repository).findAll();
+        verify(service).findAll();
+    }
+
+    @Test
+    public void deleteAQuiz() {
+        Quiz toDelete = Quiz.builder()
+                .title("toDelete").id(1l).build();
+        doReturn(Mono.just(toDelete)).when(service).findById(1l);
+        doReturn(Mono.empty()).when(service).delete(toDelete);
+
+        webClient.delete()
+                .uri("/quizzes/1")
+                .exchange()
+                .expectStatus().is2xxSuccessful();
+
+        verify(service).findById(1l);
+        verify(service).delete(toDelete);
     }
 
     Answer<Mono<Quiz>> quizWithId() {

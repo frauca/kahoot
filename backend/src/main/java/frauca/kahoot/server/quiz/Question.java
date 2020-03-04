@@ -21,32 +21,31 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//Could not be immutable. I have not get the point to make it work with r2dbc
 @Data
 @Builder(toBuilder = true)
-@JsonDeserialize(builder = Quiz.QuizBuilder.class)
-@NoArgsConstructor
+@JsonDeserialize(builder = Question.QuestionBuilder.class)
 @AllArgsConstructor
-public class Quiz {
+@NoArgsConstructor
+public class Question {
 
     @Id
     @Builder.Default
     Long id = null;
     @NonNull
-    String title;
+    String question;
+    Long quizId;
     @Transient
     @Builder.Default
-    List<Question> questions = new ArrayList<>();
+    List<Answer> answers = new ArrayList<>();
 
     @JsonPOJOBuilder(withPrefix = "")
-    public static class QuizBuilder {
+    public static class QuestionBuilder {
 
     }
 }

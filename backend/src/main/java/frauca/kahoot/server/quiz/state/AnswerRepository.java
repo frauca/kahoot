@@ -14,10 +14,13 @@
 
 package frauca.kahoot.server.quiz.state;
 
-import frauca.kahoot.server.quiz.Quiz;
+import frauca.kahoot.server.quiz.Answer;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
-@Repository
-interface QuizRepository extends ReactiveCrudRepository<Quiz, Long> {
+interface AnswerRepository extends ReactiveCrudRepository<Answer, Long> {
+
+    @Query("SELECT * FROM answer WHERE question_id = :id")
+    Flux<Answer> findByQuestionId(long id);
 }
