@@ -29,3 +29,9 @@ build/
 
 ### VS Code ###
 .vscode/
+/data/db.mv.db
+/data/db.trace.db
+/data/db?options=DB_CLOSE_DELAY=-1.mv.db
+/frontend/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+/frontend/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
+/frontend/package-lock.json
