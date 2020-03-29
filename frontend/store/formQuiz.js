@@ -32,9 +32,17 @@ export const mutations = {
   }
 }
 
+function emptyAnswer() {
+  return {
+    answer: 'Write your answer',
+    correct: false
+  }
+}
+
 function emptyQuestion() {
   return {
-    question: 'Write your question'
+    question: 'Write your question',
+    answers: [emptyAnswer()]
   }
 }
 

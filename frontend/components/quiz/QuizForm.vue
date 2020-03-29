@@ -1,5 +1,5 @@
 <template>
-  <b-container class="bv-example-row">
+  <b-container class="bv-example-row" fluid>
     <b-row>
       <b-form @submit="onSubmit" v-if="quiz">
         <b-form-group
@@ -20,7 +20,11 @@
             <b-button v-b-toggle="'question-' + i" variant="primary">{{
               q.question
             }}</b-button>
-            <b-collapse :id="'question-' + i" class="mt-2">
+            <b-collapse
+              :id="'question-' + i"
+              accordion="acd-questions"
+              class="mt-2"
+            >
               <b-card>
                 <p class="card-text">
                   <b-form-group
@@ -35,6 +39,22 @@
                       placeholder="Question"
                     ></b-form-input>
                   </b-form-group>
+                  <b-container class="answer-by-question" fluid>
+                    <b-row class="text-center">
+                      <b-col
+                        key="a.answer"
+                        v-for="(a, j) in q.answers"
+                        cols="12"
+                      >
+                        <b-form-input
+                          :id="'answer-' + i + '-' + j"
+                          v-model="a.answer"
+                          type="text"
+                          placeholder="Answer"
+                        />
+                      </b-col>
+                    </b-row>
+                  </b-container>
                 </p>
               </b-card>
             </b-collapse>
