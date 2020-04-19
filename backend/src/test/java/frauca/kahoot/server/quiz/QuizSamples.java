@@ -46,11 +46,17 @@ public class QuizSamples {
 
     public static Quiz aCompleteQuiz() {
         Quiz quiz = aQuiz();
-        Question question = aQuestion("sample question", null);
-        Answer answer = aAnswer("answer", true, null).toBuilder().id(null).build();
-        question = question.toBuilder().id(null).answers(List.of(answer)).build();
-        return quiz.toBuilder().id(null).questions(List.of(question)).build();
 
+        return quiz.toBuilder().id(null)
+                .questions(List.of(questionWithAnswers(), questionWithAnswers()))
+                .build();
+    }
+
+    private static Question questionWithAnswers() {
+        Question question = aQuestion("sample question", null);
+        Answer correct = aAnswer("answer", true, null).toBuilder().id(null).build();
+        Answer incorrect = aAnswer("answer 2", false, null).toBuilder().id(null).build();
+        return question.toBuilder().id(null).answers(List.of(correct, incorrect)).build();
     }
 
     static long random() {

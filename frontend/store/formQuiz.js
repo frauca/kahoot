@@ -6,17 +6,17 @@ export const actions = {
   initQuiz(context) {
     context.commit('select', emptyQuiz())
   },
-  addQuestion(context, question) {
-    if (!question) {
-      question = emptyQuestion()
-    }
-    context.commit('addQuestion', question)
-  },
   add(context, quiz) {
     this.$axios.$post('http://localhost:8080/quizzes', quiz).then((quiz) => {
       context.commit('select', quiz)
       context.dispatch('all')
     })
+  },
+  select(context, quiz) {
+    if (!quiz) {
+      quiz = emptyQuiz()
+    }
+    context.commit('select', quiz)
   }
 }
 
@@ -34,14 +34,14 @@ export const mutations = {
 
 function emptyAnswer() {
   return {
-    answer: 'Write your answer',
+    answer: 'Write your 1st answer',
     correct: false
   }
 }
 
 function emptyQuestion() {
   return {
-    question: 'Write your question',
+    question: 'Write your 1st question',
     answers: [emptyAnswer()]
   }
 }

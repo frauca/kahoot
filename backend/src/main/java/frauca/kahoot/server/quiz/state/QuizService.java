@@ -56,6 +56,11 @@ public class QuizService {
                 .flatMap(this::saveAllQuestions);
     }
 
+    public Mono<Question> findQuestionById(Long questionId){
+        return questionRepository.findById(questionId)
+                .flatMap(this::fillQuestion);
+    }
+
     private Mono<Quiz> saveAllQuestions(Quiz savedQuiz) {
         return getQuestionsLinkedToThis(savedQuiz)
                 .flatMap(this::save)

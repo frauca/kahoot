@@ -18,9 +18,9 @@ import frauca.kahoot.server.quiz.Quiz;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import static frauca.kahoot.server.quiz.QuizSamples.aCompleteQuiz;
@@ -47,6 +47,101 @@ public class ServerApplicationIT {
                 .jsonPath("$.questions[0].answers[0].id").isNotEmpty()
                 .jsonPath("$.title").isEqualTo(aQuiz().getTitle());
 
+
+        deleteAllQuizzes();
+
+    }
+
+    @Test
+    public void startGame() {
+        webTestClient.post().uri("/quizzes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(aCompleteQuiz()), Quiz.class)
+                .exchange()
+                .expectBody()
+                .jsonPath("$.id").value(
+                quiz_id -> webTestClient.get().uri("/games/of/" + quiz_id)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                        .expectBody()
+                        .jsonPath("$.quiz.id").isEqualTo(quiz_id)
+                        .jsonPath("$.id").value(
+                                game_id -> {
+                                    Long gameId = Long.valueOf(game_id.toString());
+                                    add2Players(gameId);
+                                    playGame(gameId);
+                                }
+                        )
+        );
+
+        deleteAllQuizzes();
+
+    }
+
+    void add2Players(Long game_id) {
+        webTestClient.post().uri("/games/" + game_id + "/player/player1")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").exists()
+                .jsonPath("$.name").isEqualTo("player1")
+                .jsonPath("$.game.id").isEqualTo(game_id.toString());
+        webTestClient.post().uri("/games/" + game_id + "/player/player2")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").exists()
+                .jsonPath("$.name").isEqualTo("player2");
+        webTestClient.get().uri("/games/" + game_id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.players[0].name").isEqualTo("player1")
+                .jsonPath("$.players[1].name").isEqualTo("player2");
+    }
+
+    void playGame(Long game_id){
+        webTestClient.get().uri("/games/" + game_id + "/next_question")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").exists()
+                .jsonPath("$.roll.startTime").exists()
+                .jsonPath("$.roll.endTime").exists()
+                .jsonPath("$.roll.question").exists();
+        webTestClient.get().uri("/games/" + game_id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.rolls[1].endTime").doesNotExist();
+        webTestClient.get().uri("/games/" + game_id + "/next_question")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").exists()
+                .jsonPath("$.roll.question").exists();
+        webTestClient.get().uri("/games/" + game_id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.rolls[1].endTime").exists();
+        webTestClient.get().uri("/games/" + game_id + "/next_question")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+
+    void deleteAllQuizzes() {
         webTestClient.get().uri("/quizzes")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -55,13 +150,11 @@ public class ServerApplicationIT {
                 .expectBody()
                 .jsonPath("$..title").isNotEmpty()
                 .jsonPath("$.[0].title").isEqualTo(aQuiz().getTitle())
-                .jsonPath("$.[0].id").value((id) -> {
-            webTestClient.delete().uri("/quizzes/" + id)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().isOk();
-        });
-
-
+                .jsonPath("$.[0].id").value(
+                (id) -> webTestClient.delete().uri("/quizzes/" + id)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .exchange()
+                        .expectStatus().isOk()
+        );
     }
 }

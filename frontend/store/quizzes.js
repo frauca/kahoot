@@ -13,6 +13,15 @@ export const actions = {
       context.commit('select', quiz)
       context.dispatch('all')
     })
+  },
+  delete(context, quiz) {
+    if (quiz && quiz.id) {
+      this.$axios
+        .$delete('http://localhost:8080/quizzes/' + quiz.id)
+        .then((quiz) => {
+          context.dispatch('all')
+        })
+    }
   }
 }
 

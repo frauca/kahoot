@@ -20,3 +20,13 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+
+## Pending
+
+* soket.io
+* real event driven
+* stateless
+* server side validation / form validation
+* Error handling
+* test on vue side
+* Do not make so many intermediate pages
