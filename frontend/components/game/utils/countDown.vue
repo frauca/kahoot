@@ -1,6 +1,6 @@
 <template>
   <b-progress :max="max">
-    <b-progress-bar :value="value"> {{ value }} s</b-progress-bar>
+    <b-progress-bar :value="value"> -{{ max - value }} s</b-progress-bar>
   </b-progress>
 </template>
 

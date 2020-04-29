@@ -15,9 +15,15 @@
 package frauca.kahoot.server.game.state;
 
 import frauca.kahoot.server.game.Choice;
+import frauca.kahoot.server.game.Player;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
 public interface ChoiceRepository extends ReactiveCrudRepository<Choice,Long> {
+
+    @Query("SELECT * FROM choice WHERE roll_id = :id")
+    Flux<Choice> findByRollId(long id);
 }

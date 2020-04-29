@@ -1,6 +1,5 @@
 package frauca.kahoot.server.game;
 
-import frauca.kahoot.server.game.state.ChoiceRepository;
 import frauca.kahoot.server.game.state.RollRepository;
 import frauca.kahoot.server.quiz.Question;
 import frauca.kahoot.server.quiz.state.QuizService;
@@ -41,7 +40,7 @@ class RollServiceTest {
     RollRepository roundRepository;
 
     @Mock
-    ChoiceRepository choiceRepository;
+    PlayerService playerService;
 
     @Mock
     QuizService quizService;
@@ -53,6 +52,7 @@ class RollServiceTest {
     public void setUp() {
         doAnswer(roundWithId()).when(roundRepository).save(any(Roll.class));
         doReturn(Mono.empty()).when(quizService).findQuestionById(anyLong());
+        doReturn(Mono.empty()).when(playerService).fillChoices(any(Roll.class));
     }
 
     @Test

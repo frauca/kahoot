@@ -52,7 +52,7 @@ public class QuizSamples {
                 .build();
     }
 
-    private static Question questionWithAnswers() {
+    public static Question questionWithAnswers() {
         Question question = aQuestion("sample question", null);
         Answer correct = aAnswer("answer", true, null).toBuilder().id(null).build();
         Answer incorrect = aAnswer("answer 2", false, null).toBuilder().id(null).build();

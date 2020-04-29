@@ -31,21 +31,21 @@ import java.util.List;
 class RollService {
     static final Duration TIME_TO_ANSWER = Duration.ofSeconds(15);
 
-    private final RollRepository roundRepository;
-    private final ChoiceRepository choiceRepository;
+    private final RollRepository rollRepository;
     private final QuizService quizService;
+    private final PlayerService playerService;
 
-    RollService(RollRepository roundRepository, ChoiceRepository choiceRepository, QuizService quizService) {
-        this.roundRepository = roundRepository;
-        this.choiceRepository = choiceRepository;
+    RollService(RollRepository roundRepository, ChoiceRepository choiceRepository, QuizService quizService, PlayerService playerService) {
+        this.rollRepository = roundRepository;
         this.quizService = quizService;
+        this.playerService = playerService;
     }
 
 
     Mono<Roll> startRoll(Roll roll) {
         LocalTime start = LocalTime.now();
         LocalTime end = start.plus(TIME_TO_ANSWER);
-        return roundRepository.save(
+        return rollRepository.save(
                 roll.toBuilder()
                         .startTime(start)
                         .endTime(end)
@@ -56,7 +56,7 @@ class RollService {
     Flux<Roll> rollsFrom(Game game, List<Question> questions) {
         return Flux.fromIterable(questions)
                 .map(question -> this.rollFrom(game, question))
-                .flatMap(roundRepository::save);
+                .flatMap(rollRepository::save);
     }
 
     Integer nextRoll(Game game) {
@@ -72,8 +72,9 @@ class RollService {
     }
 
     Flux<Roll> rollOfGame(Game game) {
-        return roundRepository.findByGameId(game.getId())
-                .flatMap(this::fillWithQuestion);
+        return rollRepository.findByGameId(game.getId())
+                .flatMap(this::fillWithQuestion)
+                .flatMap(playerService::fillChoices);
     }
 
     Mono<Roll> fillWithQuestion(Roll round){

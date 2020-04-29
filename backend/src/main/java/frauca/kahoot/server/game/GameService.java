@@ -32,15 +32,17 @@ public class GameService {
     private final GameRepository gameRepository;
     private final PlayerService playerService;
     private final RollService rollService;
+    private final ResultService resultService;
 
     public GameService(QuizService quizService,
                        GameRepository gameRepository,
                        PlayerService playerService,
-                       RollService rollService) {
+                       RollService rollService, ResultService resultService) {
         this.quizService = quizService;
         this.gameRepository = gameRepository;
         this.playerService = playerService;
         this.rollService = rollService;
+        this.resultService = resultService;
     }
 
     public Mono<Game> gameFrom(Long quiz_id) {
@@ -79,7 +81,20 @@ public class GameService {
                                     );
                         }
                 )
-                .flatMap(gameRepository::save);
+                .flatMap(gameRepository::save)
+                .map(resultService::score);
+    }
+
+    public Mono<Game> chose(Long playerId, Long answerId) {
+        return findPlayer(playerId)
+                .flatMap(player -> playerService.makeChoice(
+                        player,
+                        player.getGame().roll(),
+                        answerId
+                        )
+                )
+                .map(choice -> choice.getGame())
+                .flatMap(this::fillGame);
     }
 
     public Mono<Player> findPlayer(Long playerId) {
@@ -118,10 +133,10 @@ public class GameService {
                                 .build()
                 ).zipWith(
                         rollService.rollOfGame(game).collectList(),
-                        (filled, rounds) -> filled.toBuilder()
-                                .rolls(rounds)
+                        (filled, rolls) -> filled.toBuilder()
+                                .rolls(rolls)
                                 .build()
-                );
+                ).map(resultService::score);
     }
 
     private Player linkGameToPlayer(Game game, Player player) {

@@ -50,6 +50,7 @@ public class GameRouter {
                         .GET("", accept(MediaType.APPLICATION_JSON), this::all)
                         .GET("/{id}/next_question", accept(MediaType.APPLICATION_JSON), this::nextQuestion)
                         .POST("/{id}/player/{name}", accept(MediaType.APPLICATION_JSON), this::addPlayer)
+                        .POST("/{player}/choose/{answer}", accept(MediaType.APPLICATION_JSON), this::playerChoice)
                 )
                 .build();
     }
@@ -84,6 +85,15 @@ public class GameRouter {
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(fromPublisher(player, Player.class));
+    }
+
+    public Mono<ServerResponse> playerChoice(ServerRequest request) {
+        long playerId = Objects.requireNonNull(Long.valueOf(request.pathVariable("player")));
+        long answerId = Objects.requireNonNull(Long.valueOf(request.pathVariable("answer")));
+        Mono<Game> game = gameService.chose(playerId, answerId);
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(fromPublisher(game, Game.class));
     }
 
     public Mono<ServerResponse> nextQuestion(ServerRequest request) {

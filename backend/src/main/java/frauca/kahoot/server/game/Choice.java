@@ -21,8 +21,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+
+import java.time.LocalTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -35,9 +38,9 @@ public class Choice {
     @Builder.Default
     Long id = null;
 
-    Long roundId;
+    Long rollId;
     @Transient
-    Roll round;
+    Roll roll;
 
     Long playerId;
     @Transient
@@ -46,6 +49,17 @@ public class Choice {
     Long answerId;
     @Transient
     Answer answer;
+
+    @NonNull
+    LocalTime choiceTime;
+
+    @Transient
+    @Builder.Default
+    int result = 0;
+
+    Game getGame(){
+        return getPlayer().getGame();
+    }
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class ChoiceBuilder {

@@ -12,7 +12,6 @@ export class GamePoller {
     return new Promise((resolve, reject) => {
       this.callOnNextRoll(player.game.id, player.game.currentRoll).then(
         (game) => {
-          player.game = game
           resolve(player)
         }
       )

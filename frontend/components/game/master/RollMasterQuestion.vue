@@ -1,11 +1,16 @@
 <template>
-  <b-container fluid>
-    <b-row v-if="question">
+  <b-container fluid class="m-0 p-0">
+    <b-row v-if="question" class="my-2">
       <b-col>{{ question.question }}</b-col>
     </b-row>
-    <b-row>
+    <b-row class="my-2">
       <b-col>
         <count-down v-on:timeIsUp="seeTheResults()" />
+      </b-col>
+    </b-row>
+    <b-row v-if="nextRollAviable">
+      <b-col>
+        <answers with-answers />
       </b-col>
     </b-row>
   </b-container>
@@ -13,14 +18,20 @@
 
 <script>
 import CountDown from '../utils/countDown'
+import Answers from '../question/Answers'
 
 export default {
   name: 'RollMasterQuestion',
-  components: { CountDown },
+  components: { Answers, CountDown },
   props: {
     id: {
       type: Number,
       required: true
+    }
+  },
+  data() {
+    return {
+      nextRollAviable: false
     }
   },
   computed: {
@@ -35,7 +46,9 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('game/nextRoll', this.id)
+    this.$store.dispatch('game/nextRoll', this.id).then((game) => {
+      this.nextRollAviable = true
+    })
   },
   methods: {
     seeTheResults() {

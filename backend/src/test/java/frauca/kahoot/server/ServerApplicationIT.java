@@ -14,6 +14,7 @@
 
 package frauca.kahoot.server;
 
+import frauca.kahoot.server.game.Game;
 import frauca.kahoot.server.quiz.Quiz;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static frauca.kahoot.server.quiz.QuizSamples.aCompleteQuiz;
 import static frauca.kahoot.server.quiz.QuizSamples.aQuiz;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServerApplicationIT {
@@ -81,6 +84,8 @@ public class ServerApplicationIT {
     }
 
     void add2Players(Long game_id) {
+        long player1Id;
+        long player2Id;
         webTestClient.post().uri("/games/" + game_id + "/player/player1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -112,9 +117,10 @@ public class ServerApplicationIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.id").exists()
-                .jsonPath("$.roll.startTime").exists()
+                .jsonPath("$.roll.endTime").exists()
                 .jsonPath("$.roll.endTime").exists()
                 .jsonPath("$.roll.question").exists();
+
         webTestClient.get().uri("/games/" + game_id)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

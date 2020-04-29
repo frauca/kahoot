@@ -17,9 +17,12 @@ package frauca.kahoot.server.game;
 import frauca.kahoot.server.quiz.Question;
 import frauca.kahoot.server.quiz.Quiz;
 
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
 import java.util.Random;
 
+import static frauca.kahoot.server.game.RollService.TIME_TO_ANSWER;
 import static frauca.kahoot.server.quiz.QuizSamples.aQuiz;
 
 public class GameSamples {
@@ -55,7 +58,7 @@ public class GameSamples {
     public static Roll aStartedRoll(Question question){
         return aRoll(question).toBuilder()
                 .startTime(LocalTime.now())
-                .endTime(LocalTime.now())
+                .endTime(LocalTime.now().plus(TIME_TO_ANSWER))
                 .build();
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <player-question></player-question>
+  <player-question />
 </template>
 
 <script>

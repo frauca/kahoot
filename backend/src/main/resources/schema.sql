@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS choice (
                                       roll_id INT NOT NULL,
                                       answer_id INT NOT NULL,
                                       player_id INT NOT NULL,
-                                      choiceTime TIME NOT NULL
+                                      choice_time TIME NOT NULL
 );
 
 ALTER TABLE answer

@@ -40,6 +40,9 @@ public class Player {
     @Transient
     Game game;
 
+    @Transient
+    int result;
+
     @JsonPOJOBuilder(withPrefix = "")
     public static class PlayerBuilder {
 

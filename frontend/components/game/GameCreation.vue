@@ -21,6 +21,7 @@
             v-for="player in game.players"
             :key="player.id"
             :text="player.avatar"
+            class="mx-2"
           ></b-avatar>
         </div>
       </b-col>

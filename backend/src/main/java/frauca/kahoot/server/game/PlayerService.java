@@ -14,22 +14,42 @@
 
 package frauca.kahoot.server.game;
 
+import frauca.kahoot.server.game.state.ChoiceRepository;
 import frauca.kahoot.server.game.state.PlayerRepository;
+import frauca.kahoot.server.quiz.state.QuizService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalTime;
 
 @Service
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
+    private final ChoiceRepository choiceRepository;
+    private final QuizService quizService;
 
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository, ChoiceRepository choiceRepository, QuizService quizService) {
         this.playerRepository = playerRepository;
+        this.choiceRepository = choiceRepository;
+        this.quizService = quizService;
     }
 
     public Mono<Player> findById(Long playerId) {
         return playerRepository.findById(playerId);
+    }
+
+    public Mono<Choice> makeChoice(Player player, Roll roll, long answerId) {
+        return choiceRepository.save(
+                Choice.builder()
+                        .answerId(answerId)
+                        .playerId(player.getId())
+                        .rollId(roll.getId())
+                        .player(player)
+                        .choiceTime(LocalTime.now())
+                        .build()
+        );
     }
 
     public Flux<Player> findByGameId(Long gameId) {
@@ -42,11 +62,37 @@ public class PlayerService {
         );
     }
 
+    public Mono<Roll> fillChoices(Roll roll) {
+        return choiceRepository
+                .findByRollId(roll.getId())
+                .flatMap(this::fillWitPlayer)
+                .flatMap(this::fillWithAnswer)
+                .collectList()
+                .map(choices ->
+                        roll.toBuilder()
+                                .choices(choices)
+                                .build());
+    }
+
     private Player playerFrom(Long gameId, String name) {
         String avatar = name.substring(0, Math.min(2, name.length())).toUpperCase();
         return Player.builder()
                 .name(name)
                 .avatar(avatar)
                 .gameId(gameId).build();
+    }
+
+    private Mono<Choice> fillWitPlayer(Choice choice) {
+        return findById(choice.getPlayerId())
+                .map(player -> choice.toBuilder()
+                        .player(player)
+                        .build());
+    }
+
+    private Mono<Choice> fillWithAnswer(Choice choice) {
+        return quizService.findAnswer(choice.getAnswerId())
+                .map(answer -> choice.toBuilder()
+                        .answer(answer)
+                        .build());
     }
 }

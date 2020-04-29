@@ -3,6 +3,14 @@ export const state = () => ({
   player: emptyPlayer()
 })
 
+export const getters = {
+  playersByScore(context) {
+    return [...context.game.players].sort((p1, p2) => {
+      return p1.result - p2.result
+    })
+  }
+}
+
 export const actions = {
   from(context, quizId) {
     return new Promise((resolve, reject) => {
@@ -47,6 +55,22 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .$get('http://localhost:8080/games/' + gameId + '/next_question/')
+        .then((game) => {
+          context.commit('select', game)
+          resolve(game)
+        })
+    })
+  },
+  chooseAnswer(context, choose) {
+    return new Promise((resolve, reject) => {
+      this.$axios
+        .$post(
+          'http://localhost:8080/games/' +
+            choose.player +
+            '/choose/' +
+            choose.answer +
+            '/'
+        )
         .then((game) => {
           context.commit('select', game)
           resolve(game)

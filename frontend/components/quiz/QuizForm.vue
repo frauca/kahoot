@@ -109,7 +109,13 @@ export default {
         this.quiz.questions = []
       }
       this.quiz.questions.push({
-        question: 'Write your ' + this.quiz.questions.length + ' question'
+        question: 'Write your ' + this.quiz.questions.length + ' question',
+        answers: [
+          {
+            answer: 'Write your 0 answer',
+            correct: false
+          }
+        ]
       })
     },
     correctBackground(answer) {
