@@ -18,7 +18,12 @@ The features will be:
 
 ## Run the project
 
-on the root folder run `mvn spring-boot:run -pl backend`
+on the root folder run 
+
+`
+mvn package
+mvn spring-boot:run -pl backend
+`
 
 ### NUXT commands
 

@@ -57,12 +57,16 @@ class GameServiceTest {
     @Mock
     RollService rollService;
 
+    @Mock
+    ResultService resultService;
+
     @InjectMocks
     GameService gameService;
 
     @BeforeEach
     public void setUp() {
         doAnswer(gameWithId()).when(gameRepository).save(any(Game.class));
+        doAnswer(i->i.getArguments()[0]).when(resultService).score(any(Game.class));
 
         quiz = aQuiz();
         quiz = quiz.toBuilder().questions(List.of(aQuestion("Sample", quiz.getId()))).build();

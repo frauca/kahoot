@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 class RollServiceTest {
 
     @Mock
-    RollRepository roundRepository;
+    RollRepository rollRepository;
 
     @Mock
     PlayerService playerService;
@@ -50,7 +50,7 @@ class RollServiceTest {
 
     @BeforeEach
     public void setUp() {
-        doAnswer(roundWithId()).when(roundRepository).save(any(Roll.class));
+        doAnswer(roundWithId()).when(rollRepository).save(any(Roll.class));
         doReturn(Mono.empty()).when(quizService).findQuestionById(anyLong());
         doReturn(Mono.empty()).when(playerService).fillChoices(any(Roll.class));
     }
@@ -98,24 +98,25 @@ class RollServiceTest {
                 )
                 .verifyComplete();
 
-        verify(roundRepository, times(2)).save(any(Roll.class));
+        verify(rollRepository, times(2)).save(any(Roll.class));
     }
 
     @Test
-    public void getRounds() {
+    public void getRolls() {
         Game game = aGame();
         Roll expected = aRoll(aQuestion("sample", 1L));
         doReturn(Mono.just(expected.getQuestion())).when(quizService).findQuestionById(anyLong());
-        doReturn(Flux.just(expected)).when(roundRepository).findByGameId(eq(game.getId()));
+        doAnswer(i->Mono.just(i.getArgument(0))).when(playerService).fillChoices(any(Roll.class));
+        doReturn(Flux.just(expected)).when(rollRepository).findByGameId(eq(game.getId()));
 
         StepVerifier.create(service.rollOfGame(game))
-                .assertNext(round -> {
-                    assertThat(round.getId())
+                .assertNext(roll -> {
+                    assertThat(roll.getId())
                             .isSameAs(expected.getId());
                 })
                 .verifyComplete();
 
-        verify(roundRepository, times(1)).findByGameId(eq(game.getId()));
+        verify(rollRepository, times(1)).findByGameId(eq(game.getId()));
         verify(quizService, times(1)).findQuestionById(eq(expected.getQuestionId()));
     }
 
