@@ -9,11 +9,6 @@ export default {
     return {
       uri: this.$route.query.uri
     }
-  },
-  created() {
-    this.$router.push({
-      path: this.uri
-    })
   }
 }
 </script>

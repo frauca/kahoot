@@ -22,8 +22,18 @@ on the root folder run
 
 `
 mvn package
-mvn spring-boot:run -pl backend
+npm run dev (on frontend)
+mvn spring-boot:run (on backend)
 `
+goto http://localhost:3000/
+
+to run as 
+
+`
+mvn spring-boot:run -pl backend 
+`
+
+dynamic routes must be converted to params
 
 ### NUXT commands
 
